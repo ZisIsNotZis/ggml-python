@@ -831,15 +831,15 @@ ggml_tensor._fields_ = [
     ("flags", ctypes.c_int),
     ("grad", ctypes.POINTER(ggml_tensor)),
     ("src", ctypes.POINTER(ggml_tensor) * GGML_MAX_SRC),
-    ("perf_runs", ctypes.c_int),
-    ("perf_cycles", ctypes.c_int64),
-    ("perf_time_us", ctypes.c_int64),
+    # ("perf_runs", ctypes.c_int),
+    # ("perf_cycles", ctypes.c_int64),
+    # ("perf_time_us", ctypes.c_int64),
     ("view_src", ctypes.POINTER(ggml_tensor)),
     ("view_offs", ctypes.c_size_t),
     ("data", ctypes.c_void_p),
     ("name", ctypes.c_char * GGML_MAX_NAME),
     ("extra", ctypes.c_void_p),
-    ("padding", ctypes.c_char * 8),
+    # ("padding", ctypes.c_char * 8),
 ]
 
 GGML_TENSOR_SIZE = ctypes.sizeof(ggml_tensor)
