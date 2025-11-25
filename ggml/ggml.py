@@ -164,17 +164,19 @@ def ctypes_function_for_shared_library(lib: ctypes.CDLL):
     ):
         def decorator(f: F) -> F:
             if enabled:
-                func = getattr(lib, name)
-                func.argtypes = argtypes
-                func.restype = restype
-                functools.wraps(f)(func)
-                return func
-            else:
-                def f_(*args: Any, **kwargs: Any):
-                    raise RuntimeError(
-                        f"Function '{name}' is not available in the shared library (enabled=False)"
-                    )
-                return cast(F, f_)
+                try:
+                    func = getattr(lib, name)
+                    func.argtypes = argtypes
+                    func.restype = restype
+                    functools.wraps(f)(func)
+                    return func
+                except AttributeError:
+                    pass
+            def f_(*args: Any, **kwargs: Any):
+                raise RuntimeError(
+                    f"Function '{name}' is not available in the shared library (enabled=False)"
+                )
+            return cast(F, f_)
 
         return decorator
 
@@ -798,18 +800,18 @@ class ggml_tensor(ctypes.Structure):
 
     if TYPE_CHECKING:
         type: int
-        backend: int
+        # backend: int
         buffer: CtypesPointer[ggml_backend_buffer]
         ne: CtypesArray[ctypes.c_int64]
         nb: CtypesArray[ctypes.c_size_t]
         op: int
         op_params: CtypesArray[ctypes.c_int32]
         flags: int
-        grad: CtypesPointer[ggml_tensor]
+        # grad: CtypesPointer[ggml_tensor]
         src: CtypesArray[ggml_tensor_p]
-        perf_runs: int
-        perf_cycles: int
-        perf_time_us: int
+        # perf_runs: int
+        # perf_cycles: int
+        # perf_time_us: int
         view_src: CtypesPointer[ggml_tensor]
         view_offs: int
         data: Optional[ctypes.c_void_p]
@@ -819,7 +821,7 @@ class ggml_tensor(ctypes.Structure):
 
 ggml_tensor._fields_ = [
     ("type", ctypes.c_int),
-    ("backend", ctypes.c_int),
+    # ("backend", ctypes.c_int),
     ("buffer", ctypes.c_void_p),
     ("ne", ctypes.c_int64 * GGML_MAX_DIMS),
     ("nb", ctypes.c_size_t * GGML_MAX_DIMS),
@@ -829,7 +831,7 @@ ggml_tensor._fields_ = [
         ctypes.c_int32 * (GGML_MAX_OP_PARAMS // ctypes.sizeof(ctypes.c_int32)),
     ),
     ("flags", ctypes.c_int),
-    ("grad", ctypes.POINTER(ggml_tensor)),
+    # ("grad", ctypes.POINTER(ggml_tensor)),
     ("src", ctypes.POINTER(ggml_tensor) * GGML_MAX_SRC),
     # ("perf_runs", ctypes.c_int),
     # ("perf_cycles", ctypes.c_int64),
@@ -839,7 +841,7 @@ ggml_tensor._fields_ = [
     ("data", ctypes.c_void_p),
     ("name", ctypes.c_char * GGML_MAX_NAME),
     ("extra", ctypes.c_void_p),
-    # ("padding", ctypes.c_char * 8),
+    ("padding", ctypes.c_char * 8),
 ]
 
 GGML_TENSOR_SIZE = ctypes.sizeof(ggml_tensor)
