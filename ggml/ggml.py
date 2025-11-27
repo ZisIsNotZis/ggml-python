@@ -170,8 +170,8 @@ def ctypes_function_for_shared_library(lib: ctypes.CDLL):
                     func.restype = restype
                     functools.wraps(f)(func)
                     return func
-                except AttributeError:
-                    pass
+                except AttributeError as e:
+                    print(e)
             def f_(*args: Any, **kwargs: Any):
                 raise RuntimeError(
                     f"Function '{name}' is not available in the shared library (enabled=False)"
@@ -5235,7 +5235,7 @@ def ggml_im2col(
     ...
 
 
-# GGML_API struct ggml_tensor * ggml_conv_depthwise_2d(
+# GGML_API struct ggml_tensor * ggml_conv_2d_dw(
 #         struct ggml_context * ctx,
 #         struct ggml_tensor  * a,
 #         struct ggml_tensor  * b,
@@ -5246,7 +5246,7 @@ def ggml_im2col(
 #         int                  d0,
 #         int                  d1);
 @ggml_function(
-    "ggml_conv_depthwise_2d",
+    "ggml_conv_2d_dw",
     [
         ggml_context_p_ctypes,
         ctypes.POINTER(ggml_tensor),
@@ -5260,7 +5260,7 @@ def ggml_im2col(
     ],
     ctypes.POINTER(ggml_tensor),
 )
-def ggml_conv_depthwise_2d(
+def ggml_conv_2d_dw(
     ctx: ggml_context_p,
     a: ggml_tensor_p,
     b: ggml_tensor_p,
@@ -5274,6 +5274,44 @@ def ggml_conv_depthwise_2d(
 ) -> ggml_tensor_p:
     ...
 
+# GGML_API struct ggml_tensor * ggml_conv_2d_dw_direct(
+#         struct ggml_context * ctx,
+#         struct ggml_tensor  * a,
+#         struct ggml_tensor  * b,
+#         int                  s0,
+#         int                  s1,
+#         int                  p0,
+#         int                  p1,
+#         int                  d0,
+#         int                  d1);
+@ggml_function(
+    "ggml_conv_2d_dw_direct",
+    [
+        ggml_context_p_ctypes,
+        ctypes.POINTER(ggml_tensor),
+        ctypes.POINTER(ggml_tensor),
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+        ctypes.c_int,
+    ],
+    ctypes.POINTER(ggml_tensor),
+)
+def ggml_conv_2d_dw_direct(
+    ctx: ggml_context_p,
+    a: ggml_tensor_p,
+    b: ggml_tensor_p,
+    s0: Union[ctypes.c_int, int],
+    s1: Union[ctypes.c_int, int],
+    p0: Union[ctypes.c_int, int],
+    p1: Union[ctypes.c_int, int],
+    d0: Union[ctypes.c_int, int],
+    d1: Union[ctypes.c_int, int],
+    /,
+) -> ggml_tensor_p:
+    ...
 
 # GGML_API struct ggml_tensor * ggml_conv_1d(
 #         struct ggml_context * ctx,
